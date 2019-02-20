@@ -87,18 +87,28 @@ public:
      * if the key was not found and thus not removed.
     */
     bool Remove(const KeyType& key) {
+        // get location of key in underlying vector
         auto index = GetIndex(key);
         MapList& list = storage_.get()[index];
+        // iterate through vector
         for(auto it = list.begin();
             it != list.end(); ++it) {
+            // declare var entry as what the iterator points to
             MapEntry& entry = *it;
+            // if an entry has the key we are looking for, erase it
             if(key_comparer_(entry.first, key)) {
                 list.erase(it);
+                // decrement size after erasing
                 --size_;
+                // return true because entry for key was found and erased
                 return true;
             }
         }
-        return false;
+        /*
+         * return false if entry for key was not found. Nothing erased, size
+         * remains the same
+         */
+         return false;
     }
     /*
      * The Maybe type presents a useful boolean that indicates presence, and
