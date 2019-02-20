@@ -16,14 +16,23 @@ namespace map {
 
 template<typename KeyType, typename ValueType>
 class MapImpl {
+// public access modifier
 public:
+// C++ allows us to create new types, based off existing types, and define them
+    // the below will be used for Remove
     typedef std::function<bool(const KeyType&, const KeyType&)> KeyComparerFn;
+    // the below will be used for Put
     typedef std::function<uint32_t(const KeyType&)> HashCalculator;
+// private access modifier to define private types
 private:
-
     typedef std::pair<KeyType, ValueType> MapEntry;
     typedef std::vector<MapEntry> MapList;
 
+    /*
+     * In trying to understand the trailing underscores, I found the following:
+     * http://geosoft.no/development/cppstyle.html
+     * In short, it is a nice naming convention for private class variables
+     */
     const KeyComparerFn key_comparer_;
     const HashCalculator hash_calculator_;
     const uint32_t capacity_;
@@ -115,11 +124,17 @@ private:
      * the magic that bridges the map datastructure to the underlying vector
      * Vectors work by indexes, so we need a way to get the index of a value,
      * given its key.
-     * The hashing is what reduces the lookup of a value in an array O(n) to
-     * the O(1) lookup for HashMaps that we have been taught.
      */
+
     uint32_t GetIndex(const KeyType& key) const {
+        /* The hashing is what reduces the lookup of a value in an array O(n) to
+         * the O(1) lookup for HashMaps that we have been taught.
+         */
         uint32_t hash = hash_calculator_(key);
+        /* the hash function should be written so the hash is an indicator of place
+         * in underlying vector. So we now use hash to quickly calculate the index,
+         * rather than looking through sequentially.
+         */
         uint32_t index = hash % capacity_;
         return index;
     }
