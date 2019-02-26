@@ -25,7 +25,9 @@ public:
     typedef std::function<uint32_t(const KeyType&)> HashCalculator;
 // private access modifier to define private types
 private:
+    // Each entry of the Map is a pair of a key and a value
     typedef std::pair<KeyType, ValueType> MapEntry;
+    // the underlying structure is a vector of MapEntry types
     typedef std::vector<MapEntry> MapList;
 
     /*
@@ -117,7 +119,7 @@ public:
     Maybe<ValueType> Get(const KeyType& key) const {
         // creates and defines index variable, which is the index of the key
         auto index = GetIndex(key);
-
+        // declare a MapList type list,
         MapList& list = storage_.get()[index];
         for(auto it = list.begin();
             it != list.end(); ++it) {
@@ -146,6 +148,7 @@ private:
          * rather than looking through sequentially.
          */
         uint32_t index = hash % capacity_;
+        // return the index so the value can be looked up O(1) from the array/vector
         return index;
     }
 };
