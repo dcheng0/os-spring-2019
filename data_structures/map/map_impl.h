@@ -25,9 +25,10 @@ public:
     typedef std::function<uint32_t(const KeyType&)> HashCalculator;
 // private access modifier to define private types
 private:
+    // Type for map entries
     // Each entry of the Map is a pair of a key and a value
     typedef std::pair<KeyType, ValueType> MapEntry;
-    // the underlying structure is a vector of MapEntry types
+    // The underlying structure for the Map will be a vector of entries
     typedef std::vector<MapEntry> MapList;
 
     /*
@@ -39,6 +40,11 @@ private:
     const HashCalculator hash_calculator_;
     const uint32_t capacity_;
     uint32_t size_;
+    /* from https://en.cppreference.com/w/cpp/memory/unique_ptr
+     *
+     * "unique_ptr is a smart pointer that owns and manages another object through
+     * a pointer. "
+     */
     std::unique_ptr<MapList[]> storage_;
 public:
 
@@ -90,6 +96,7 @@ public:
     */
     bool Remove(const KeyType& key) {
         // get location of key in underlying vector
+        // auto should typecast index to uint32
         auto index = GetIndex(key);
         MapList& list = storage_.get()[index];
         // iterate through vector
@@ -124,16 +131,18 @@ public:
         for(auto it = list.begin();
             it != list.end(); ++it) {
             MapEntry& entry = *it;
+            // if key exists, return corresponding value
             if(key_comparer_(entry.first, key)) {
                 return Maybe<ValueType>(entry.second);
             }
         }
+        // return empty Maybe object if key is not found
         return Maybe<ValueType>();
     }
 private:
 
     /*
-     * the magic that bridges the map datastructure to the underlying vector
+     * This is the magic that bridges the map datastructure to the underlying vector
      * Vectors work by indexes, so we need a way to get the index of a value,
      * given its key.
      */
