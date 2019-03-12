@@ -7,12 +7,16 @@ class BoundBuffer {
 
 private:
     const int max_size_;
+    int size_;
 
 public:
 
     explicit BoundBuffer(int max_size) : max_size_(max_size) {}
 
-    int size() { return 0; }
+    int size() {
+        return size_;
+    }
+
 
     void addLast(const ValueType& value) {
 

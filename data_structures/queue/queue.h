@@ -23,7 +23,9 @@ public:
 		array_ = std::unique_ptr<ValueType[]>(new ValueType[2]);
 	}
 
-	int size() { return size_; }
+	int size() {
+		return size_;
+	}
 
 	void addLast(const ValueType& value) {
 		ensureCapacity(++size_);
