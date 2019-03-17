@@ -17,11 +17,22 @@ private:
 
 public:
     explicit BoundBuffer(int max_size) : max_size_(max_size) {}
+    // AKA head, front, etc
     int nextIn() {
         return (nextIn_);
     }
+    // AKA tail, back, etc
     int nextOut() {
         return (nextOut_);
+    }
+
+    bool isEmpty() {
+        if (size() == 0){
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     int size() {
@@ -31,12 +42,15 @@ public:
 
     void addLast(const ValueType& value) {
         //BufferList &list = storage_.begin(); //, storage_.end());
+        
 
         nextIn_ = value;
         nextIn_ = (nextIn() + 1) % size();
     }
 
     ValueType removeFirst() {
+        // check if queue is empty
+
         return ValueType();
     }
 };
@@ -47,3 +61,4 @@ public:
 
 // used the following link for conceptual help
 // https://github.com/uu-os-2018/module-4/blob/master/mandatory/src/bounded_buffer.c
+// https://stackoverflow.com/questions/15278343/c11-thread-safe-queue
