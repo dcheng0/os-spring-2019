@@ -36,13 +36,16 @@ public:
     explicit BoundBuffer(int max_size) : max_size_(max_size) {
     }
 
-    int size() { return 0; }
+    int size() {
+        return size_;
+    }
 
     void addLast(const ValueType& value) {
         // mutex locking and waiting structure from ref 1
         // lock mutex mx before entering critical section
         std::unique_lock<std::mutex> lock(mx);
-        while (/* Buffer is already full */) {
+        // while buffer is full
+        while (size()==max_size_){
             // wait && release mx
             nonfull.wait(lock);
         }
@@ -53,7 +56,8 @@ public:
     ValueType removeFirst() {
         // mutex locking, waiting, and notification structure from ref 1
         std::unique_lock<std::mutex> lock(mx);
-        while (/* buffer is empty */) {
+        // while buffer is empty
+        while (size()==0){
             // wait && release mx
             nonempty.wait(lock);
         }
