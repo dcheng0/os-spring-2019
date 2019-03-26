@@ -2,11 +2,12 @@
 #define DOCUMENTS_BOUND_BUFFER_H
 
 #include <vector>
+//#include "data_structures/queue/queue.h"
+#include "data_structures/queue/queue.h"
+
 namespace data_structures {
 template<typename ValueType>
 class BoundBuffer {
-public:
-
 private:
     const int max_size_;
     int size_;
@@ -42,7 +43,7 @@ public:
 
     void addLast(const ValueType& value) {
         //BufferList &list = storage_.begin(); //, storage_.end());
-        
+
 
         nextIn_ = value;
         nextIn_ = (nextIn() + 1) % size();
