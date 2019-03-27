@@ -24,9 +24,6 @@ namespace data_structures {
 template<typename ValueType>
 class BoundBuffer {
 
-public:
-
-
 private:
     const int max_size_;
     int size_;
@@ -38,6 +35,7 @@ public:
 
     int size() {
         return size_;
+
     }
 
     void addLast(const ValueType& value) {
@@ -50,6 +48,7 @@ public:
             nonfull.wait(lock);
         }
         // do add
+        size_++;
 
     }
 
@@ -62,7 +61,8 @@ public:
             nonempty.wait(lock);
         }
         // remove item
-
+        // decrement size
+        size_--;
         // notify threads waiting on full buffer
         nonfull.notify_all();
         return ValueType();
