@@ -10,27 +10,33 @@
  */
 
 #include <mutex>
-#include <condition_variable>
-#include <thread>
+#include <semaphore.h>
+#include <pthread.h>
 #include <iostream>
+#include <vector>
 
 #include "data_structures/queue/queue.h"
-
-std::mutex mx;
-std::condition_variable nonfull;
-std::condition_variable nonempty;
 
 namespace data_structures {
 template<typename ValueType>
 class BoundBuffer {
 
 private:
+    pthread_mutex_t mutex;
+    sem_t empty;
+    sem_t full;
+
     const int max_size_;
     int size_;
+    std::vector<int> storage_;
+    Queue<int> q;
+
 
 public:
 
-    explicit BoundBuffer(int max_size) : max_size_(max_size) {
+    explicit BoundBuffer(int max_size) : max_size_(max_size) {pthread_mutex_init(&mutex, nullptr);
+        sem_init(&empty, 0, max_size);
+        sem_init(&full, 0, 0);
     }
 
     int size() {
@@ -39,26 +45,33 @@ public:
     }
 
     void addLast(const ValueType& value) {
-        // mutex locking and waiting structure from ref 1
-        // lock mutex mx before entering critical section
-        std::unique_lock<std::mutex> lock(mx);
-        // while buffer is full
-        while (size()==max_size_){
-            // wait && release mx
-            nonfull.wait(lock);
-        }
-        // do add
-        size_++;
+        //while buffer is full
+        while (size()==max_size_) {
+            // empty -> down();
+            int sem_trywait(empty);
+            // mutex -> down();
+            int pthread_mutex_trylock(mutex);
+            // int item = produce_item();
+            int item = q.addLast(value);
+            int pthread_mutex_unlock(mutex);
+            int sem_trylock(full);
 
+
+
+
+        }
     }
 
-    ValueType removeFirst() {
-        // mutex locking, waiting, and notification structure from ref 1
-        std::unique_lock<std::mutex> lock(mx);
-        // while buffer is empty
+    ValueType removeFirst(){
+
         while (size()==0){
-            // wait && release mx
-            nonempty.wait(lock);
+            int sem_trylock(full);
+            // mutex locking, waiting, and notification structure from ref 1
+            //std::unique_lock<std::mutex> lock(mutex)
+            int pthread_mutex_trylock(mutex);
+            // while buffer is empty
+            int item = q.removeFirst();
+            int pthread_mutex_tryunlock(mutex);
         }
         // remove item
         // decrement size
@@ -70,7 +83,6 @@ public:
 
 
 };
-
 } // namespace data_structures
 
 #endif //DOCUMENTS_BOUND_BUFFER_H
